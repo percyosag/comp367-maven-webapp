@@ -6,7 +6,6 @@ pipeline {
   }
 
   stages {
-
     stage('Checkout') {
       steps {
         checkout scm
@@ -15,13 +14,14 @@ pipeline {
 
     stage('Build') {
       steps {
+        sh 'chmod +x mvnw'
         sh "./mvnw ${MVN_OPTS} clean package"
       }
     }
 
     stage('Archive artifact') {
       steps {
-        archiveArtifacts artifacts: 'target/*.jar,target/*.war', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
       }
     }
 
