@@ -6,6 +6,7 @@ pipeline {
   }
 
   stages {
+
     stage('Checkout') {
       steps {
         checkout scm
@@ -14,8 +15,7 @@ pipeline {
 
     stage('Build') {
       steps {
-        sh "mvn ${MVN_OPTS} clean package"
-        // If mvn isn't found on Jenkins, switch to: sh "./mvnw ${MVN_OPTS} clean package"
+        sh "./mvnw ${MVN_OPTS} clean package"
       }
     }
 
@@ -29,6 +29,15 @@ pipeline {
       steps {
         sh 'ls -lah target || true'
       }
+    }
+  }
+
+  post {
+    success {
+      echo "Build successful"
+    }
+    failure {
+      echo "Build failed"
     }
   }
 }
