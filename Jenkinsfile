@@ -1,51 +1,34 @@
 pipeline {
   agent any
 
-  tools {
-    maven 'Maven'          // optional: the name of a Maven installation in Jenkins (if configured)
-    // if you don't have a named Maven tool, the pipeline will still run 'mvn' if available on PATH
-  }
-
   environment {
-    MVN_OPTS = "-B -DskipTests" // batch mode, skip tests for speed (remove skipTests if you want tests run)
+    MVN_OPTS = "-B -DskipTests"
   }
 
   stages {
     stage('Checkout') {
       steps {
-        // Checkout from the SCM that triggered the build
         checkout scm
       }
     }
 
     stage('Build') {
       steps {
-        // Build using Maven
         sh "mvn ${MVN_OPTS} clean package"
+        // If mvn isn't found on Jenkins, switch to: sh "./mvnw ${MVN_OPTS} clean package"
       }
     }
 
     stage('Archive artifact') {
       steps {
-        // Archive the generated jar so Jenkins stores it with the build
-        archiveArtifacts artifacts: 'target/*.jar', onlyIfSuccessful: true
+        archiveArtifacts artifacts: 'target/*.jar,target/*.war', onlyIfSuccessful: true
       }
     }
 
-    stage('Smoke-run (optional)') {
+    stage('Smoke-run') {
       steps {
-        // show the produced artifact(s) and list files (quick verification)
         sh 'ls -lah target || true'
       }
-    }
-  }
-
-  post {
-    success {
-      echo "Build successful"
-    }
-    failure {
-      echo "Build failed"
     }
   }
 }
